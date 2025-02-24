@@ -19,7 +19,11 @@ const app = express();
 // MIDDLEWARE
 // Research Team - Set up CORS middleware here:
 // ...
-app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:5005', 'http://example.com'], // Add the URLs of allowed origins to this array
+  })
+);
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(express.static("public"));
