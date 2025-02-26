@@ -52,6 +52,40 @@ app.get("/api/cohorts", (req, res) => {
 app.get("/api/students", (req, res) => {
   res.json(students);
 });
+app.post("/api/students",(req,res)=>{
+   Student.create({
+    firstName:req.body.firstName,
+    lastName:req.body.lastName,
+    email:req.body.email,
+    linkedinUrl:req.body.linkedinUrl,
+    languages:req.body.languages,
+    program:req.body.program,
+    background:req.body.background,
+    image:req.body.image,
+    cohort:req.body.cohort,
+    projects:req.body.projects
+   })
+   .then((newStudent)=>{
+      res.json(newStudent);
+   })
+   .catch((error)=>{
+    return res.status(500).json({message:"error!!"});
+   })
+});
+
+app.get("/api/students/:studentId",(req,res)=>{
+  let {studentId} = (req.params);
+  studentId = parseInt(studentId);
+  Student.findById(studentId)
+  .then((student)=>{
+    console.log(student);
+    res.json(student);
+    
+  })
+  .catch((error)=>{
+    return res.status(500).json({message:error});
+  })
+});
 
 // START SERVER
 app.listen(PORT, () => {
