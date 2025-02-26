@@ -66,7 +66,7 @@ app.post("/api/students", (req, res) => {
     projects: req.body.projects,
   })
     .then((newStudent) => {
-      res.json(newStudent);
+      res.status(206).json(newStudent);
     })
     .catch((error) => {
       return res.status(500).json({ message: "error!!" });
@@ -81,10 +81,93 @@ app.get("/api/students/:studentId", (req, res) => {
       res.json(student);
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({ message: error.message });
     });
 });
+app.get("/api/students/cohort/:cohortId",(req,res)=>{
+  const{cohortId}= req.params;
+  Student.find({cohort:cohortId})
+  .then((studentsCohort)=>{
+    res.json(studentsCohort);
+  })
+  .catch((error)=>{
+    return res.status(500).json({ message: error.message });
+  })
+})
+
+app.put("/api/students/:studentId",(req,res)=>{
+  
+   Student.findByIdAndUpdate(req.params.studentId,req.body)
+   .then((updatedStudent)=>{
+    res.json(updatedStudent);
+   })
+   .catch((error)=>{
+    return res.status(500).json({ message: error.message });
+   })
+})
+app.delete("/api/students/:studentId",(req,res)=>{
+  Student.findByIdAndDelete(req.params.studentId)
+  .then(()=>{
+    return res.status(200).json({ message: "success" });
+  })
+  .catch((error)=>{
+    return res.status(500).json({ message: error.message });
+   })
+})
+app.post("/api/cohorts",(req,res)=>{
+  Cohort.create({
+    cohortSlug: req.body.cohortSlug,
+    cohortName: req.body.cohortName,
+    program: req.body.program,
+    format: req.body.format,
+    campus: req.body.campus,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+    inProgress: req.body.inProgress,
+    programManager: req.body.programManager,
+    leadTeacher: req.body.leadTeacher,
+    totalHours: req.body.totalHours,
+  })
+  .then((newCohort) => {
+    res.json(newCohort);
+  })
+  .catch((error) => {
+    return res.status(500).json({ message: "error!!" });
+  });
+})
+
+app.get("/api/cohorts/:cohortId",(req,res)=>{
+  const {cohortId} = req.params;
+
+  Cohort.findById(cohortId)
+    .then((cohort) => {
+      res.json(cohort);
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: error.message });
+    });
+})
+
+app.put("/api/cohorts/:cohortId",(req,res)=>{
+
+  Cohort.findByIdAndUpdate(req.params.cohortId,req.body)
+  .then((updatedCohort)=>{
+   res.json(updatedCohort);
+  })
+  .catch((error)=>{
+   return res.status(500).json({ message: error.message });
+  })
+
+})
+app.delete("/api/cohorts/:cohortId",(req,res)=>{
+  Cohort.findByIdAndDelete(req.params.cohortId)
+  .then(()=>{
+    return res.status(200).json({ message: "success" });
+  })
+  .catch((error)=>{
+    return res.status(500).json({ message: error.message });
+   })
+})
 
 // START SERVER
 app.listen(PORT, () => {
