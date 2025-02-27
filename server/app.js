@@ -44,20 +44,24 @@ app.use(cookieParser());
 app.get("/docs", (req, res) => {
   res.sendFile(__dirname + "/views/docs.html");
 });
+
 app.get("/api/cohorts", (req, res) => {
   Cohort.find()
-  .then((cohortsFromFDb) => {
-    res.json(cohortsFromFDb);
-  })
-  .catch((e) => res.status(500).json({ e: "Error" }));
+    .then((cohortsFromFDb) => {
+      res.json(cohortsFromFDb);
+    })
+    .catch((e) => res.status(500).json({ e: "Error" }));
 });
+
 app.get("/api/students", (req, res) => {
   Student.find()
+    .populate("cohort")
     .then((studentsFromFDb) => {
       res.json(studentsFromFDb);
     })
     .catch((e) => res.status(500).json({ e: "Error" }));
 });
+
 app.post("/api/students", (req, res) => {
   Student.create({
     firstName: req.body.firstName,
@@ -83,6 +87,7 @@ app.get("/api/students/:studentId", (req, res) => {
   const { studentId } = req.params;
 
   Student.findById(studentId)
+    .populate("cohort")
     .then((student) => {
       res.json(student);
     })
@@ -90,37 +95,40 @@ app.get("/api/students/:studentId", (req, res) => {
       return res.status(500).json({ message: error.message });
     });
 });
-app.get("/api/students/cohort/:cohortId",(req,res)=>{
-  const{cohortId}= req.params;
-  Student.find({cohort:cohortId})
-  .then((studentsCohort)=>{
-    res.json(studentsCohort);
-  })
-  .catch((error)=>{
-    return res.status(500).json({ message: error.message });
-  })
-})
 
-app.put("/api/students/:studentId",(req,res)=>{
-  
-   Student.findByIdAndUpdate(req.params.studentId,req.body)
-   .then((updatedStudent)=>{
-    res.json(updatedStudent);
-   })
-   .catch((error)=>{
-    return res.status(500).json({ message: error.message });
-   })
-})
-app.delete("/api/students/:studentId",(req,res)=>{
+app.get("/api/students/cohort/:cohortId", (req, res) => {
+  const { cohortId } = req.params;
+  Student.find({ cohort: cohortId })
+    .populate("cohort")
+    .then((studentsCohort) => {
+      res.json(studentsCohort);
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: error.message });
+    });
+});
+
+app.put("/api/students/:studentId", (req, res) => {
+  Student.findByIdAndUpdate(req.params.studentId, req.body)
+    .then((updatedStudent) => {
+      res.json(updatedStudent);
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: error.message });
+    });
+});
+
+app.delete("/api/students/:studentId", (req, res) => {
   Student.findByIdAndDelete(req.params.studentId)
-  .then(()=>{
-    return res.status(200).json({ message: "success" });
-  })
-  .catch((error)=>{
-    return res.status(500).json({ message: error.message });
-   })
-})
-app.post("/api/cohorts",(req,res)=>{
+    .then(() => {
+      return res.status(200).json({ message: "success" });
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: error.message });
+    });
+});
+
+app.post("/api/cohorts", (req, res) => {
   Cohort.create({
     cohortSlug: req.body.cohortSlug,
     cohortName: req.body.cohortName,
@@ -134,16 +142,16 @@ app.post("/api/cohorts",(req,res)=>{
     leadTeacher: req.body.leadTeacher,
     totalHours: req.body.totalHours,
   })
-  .then((newCohort) => {
-    res.json(newCohort);
-  })
-  .catch((error) => {
-    return res.status(500).json({ message: "error!!" });
-  });
-})
+    .then((newCohort) => {
+      res.json(newCohort);
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: "error!!" });
+    });
+});
 
-app.get("/api/cohorts/:cohortId",(req,res)=>{
-  const {cohortId} = req.params;
+app.get("/api/cohorts/:cohortId", (req, res) => {
+  const { cohortId } = req.params;
 
   Cohort.findById(cohortId)
     .then((cohort) => {
@@ -152,28 +160,27 @@ app.get("/api/cohorts/:cohortId",(req,res)=>{
     .catch((error) => {
       return res.status(500).json({ message: error.message });
     });
-})
+});
 
-app.put("/api/cohorts/:cohortId",(req,res)=>{
+app.put("/api/cohorts/:cohortId", (req, res) => {
+  Cohort.findByIdAndUpdate(req.params.cohortId, req.body)
+    .then((updatedCohort) => {
+      res.json(updatedCohort);
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: error.message });
+    });
+});
 
-  Cohort.findByIdAndUpdate(req.params.cohortId,req.body)
-  .then((updatedCohort)=>{
-   res.json(updatedCohort);
-  })
-  .catch((error)=>{
-   return res.status(500).json({ message: error.message });
-  })
-
-})
-app.delete("/api/cohorts/:cohortId",(req,res)=>{
+app.delete("/api/cohorts/:cohortId", (req, res) => {
   Cohort.findByIdAndDelete(req.params.cohortId)
-  .then(()=>{
-    return res.status(200).json({ message: "success" });
-  })
-  .catch((error)=>{
-    return res.status(500).json({ message: error.message });
-   })
-})
+    .then(() => {
+      return res.status(200).json({ message: "success" });
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: error.message });
+    });
+});
 
 // START SERVER
 app.listen(PORT, () => {
