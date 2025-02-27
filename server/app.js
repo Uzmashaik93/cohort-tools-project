@@ -6,8 +6,6 @@ const cors = require("cors");
 const Cohort = require("./models/cohort.model");
 const Student = require("./models/student.model");
 
-const cohorts = require("./cohorts.json");
-const students = require("./students.json");
 const PORT = 5005;
 
 // STATIC DATA
@@ -47,10 +45,18 @@ app.get("/docs", (req, res) => {
   res.sendFile(__dirname + "/views/docs.html");
 });
 app.get("/api/cohorts", (req, res) => {
-  res.json(cohorts);
+  Cohort.find()
+  .then((cohortsFromFDb) => {
+    res.json(cohortsFromFDb);
+  })
+  .catch((e) => res.status(500).json({ e: "Error" }));
 });
 app.get("/api/students", (req, res) => {
-  res.json(students);
+  Student.find()
+    .then((studentsFromFDb) => {
+      res.json(studentsFromFDb);
+    })
+    .catch((e) => res.status(500).json({ e: "Error" }));
 });
 app.post("/api/students", (req, res) => {
   Student.create({
@@ -66,7 +72,7 @@ app.post("/api/students", (req, res) => {
     projects: req.body.projects,
   })
     .then((newStudent) => {
-      res.status(206).json(newStudent);
+      res.status(200).json(newStudent);
     })
     .catch((error) => {
       return res.status(500).json({ message: "error!!" });
