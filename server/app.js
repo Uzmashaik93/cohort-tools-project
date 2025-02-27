@@ -38,8 +38,7 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(notFoundHandler);
-app.use(errorHandler);
+
  
 // ROUTES - https://expressjs.com/en/starter/basic-routing.html
 // Devs Team - Start working on the routes here:
@@ -48,24 +47,26 @@ app.get("/docs", (req, res) => {
   res.sendFile(__dirname + "/views/docs.html");
 });
 
-app.get("/api/cohorts", (req, res) => {
+app.get("/api/cohorts", (req, res, next) => {
   Cohort.find()
-    .then((cohortsFromFDb) => {
-      res.json(cohortsFromFDb);
+    .then((cohortsFromDb) => {
+      res.status(200).json(cohortsFromDb);
     })
-    .catch((e) => res.status(500).json({ e: "Error" }));
+    .catch((e) => next(e));
 });
 
-app.get("/api/students", (req, res) => {
+app.get("/api/students", (req, res, next) => {
   Student.find()
     .populate("cohort")
-    .then((studentsFromFDb) => {
-      res.json(studentsFromFDb);
+    .then((studentsFromDb) => {
+      res.status(200).json(studentsFromDb);
     })
-    .catch((e) => res.status(500).json({ e: "Error" }));
+    .catch(error => {
+      next(error);
+    });
 });
 
-app.post("/api/students", (req, res) => {
+app.post("/api/students", (req, res, next) => {
   Student.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -81,57 +82,47 @@ app.post("/api/students", (req, res) => {
     .then((newStudent) => {
       res.status(200).json(newStudent);
     })
-    .catch((error) => {
-      return res.status(500).json({ message: "error!!" });
-    });
+    .catch((e) => next(e));
 });
 
-app.get("/api/students/:studentId", (req, res) => {
+app.get("/api/students/:studentId", (req, res, next) => {
   const { studentId } = req.params;
 
   Student.findById(studentId)
     .populate("cohort")
     .then((student) => {
-      res.json(student);
+      res.status(200).json(student);
     })
-    .catch((error) => {
-      return res.status(500).json({ message: error.message });
-    });
+    .catch((e) => next(e));
 });
 
-app.get("/api/students/cohort/:cohortId", (req, res) => {
+app.get("/api/students/cohort/:cohortId", (req, res, next) => {
   const { cohortId } = req.params;
   Student.find({ cohort: cohortId })
     .populate("cohort")
     .then((studentsCohort) => {
-      res.json(studentsCohort);
+      res.status(200).json(studentsCohort);
     })
-    .catch((error) => {
-      return res.status(500).json({ message: error.message });
-    });
+    .catch((e) => next(e));
 });
 
-app.put("/api/students/:studentId", (req, res) => {
+app.put("/api/students/:studentId", (req, res, next) => {
   Student.findByIdAndUpdate(req.params.studentId, req.body)
     .then((updatedStudent) => {
-      res.json(updatedStudent);
+      res.status(200).json(updatedStudent);
     })
-    .catch((error) => {
-      return res.status(500).json({ message: error.message });
-    });
+    .catch((e) => next(e));
 });
 
-app.delete("/api/students/:studentId", (req, res) => {
+app.delete("/api/students/:studentId", (req, res, next) => {
   Student.findByIdAndDelete(req.params.studentId)
     .then(() => {
       return res.status(200).json({ message: "success" });
     })
-    .catch((error) => {
-      return res.status(500).json({ message: error.message });
-    });
+    .catch((e) => next(e));
 });
 
-app.post("/api/cohorts", (req, res) => {
+app.post("/api/cohorts", (req, res, next) => {
   Cohort.create({
     cohortSlug: req.body.cohortSlug,
     cohortName: req.body.cohortName,
@@ -146,45 +137,39 @@ app.post("/api/cohorts", (req, res) => {
     totalHours: req.body.totalHours,
   })
     .then((newCohort) => {
-      res.json(newCohort);
+      res.status(200).json(newCohort);
     })
-    .catch((error) => {
-      return res.status(500).json({ message: "error!!" });
-    });
+    .catch((e) => next(e));
 });
 
-app.get("/api/cohorts/:cohortId", (req, res) => {
+app.get("/api/cohorts/:cohortId", (req, res, next) => {
   const { cohortId } = req.params;
 
   Cohort.findById(cohortId)
     .then((cohort) => {
-      res.json(cohort);
+      res.status(200).json(cohort);
     })
-    .catch((error) => {
-      return res.status(500).json({ message: error.message });
-    });
+    .catch((e) => next(e));
 });
 
-app.put("/api/cohorts/:cohortId", (req, res) => {
+app.put("/api/cohorts/:cohortId", (req, res, next) => {
   Cohort.findByIdAndUpdate(req.params.cohortId, req.body)
     .then((updatedCohort) => {
-      res.json(updatedCohort);
+      res.status(200).json(updatedCohort);
     })
-    .catch((error) => {
-      return res.status(500).json({ message: error.message });
-    });
+    .catch((e) => next(e));
 });
 
-app.delete("/api/cohorts/:cohortId", (req, res) => {
+app.delete("/api/cohorts/:cohortId", (req, res, next) => {
   Cohort.findByIdAndDelete(req.params.cohortId)
     .then(() => {
       return res.status(200).json({ message: "success" });
     })
-    .catch((error) => {
-      return res.status(500).json({ message: error.message });
-    });
+    .catch((e) => next(e));
 });
 
+app.use(notFoundHandler);
+app.use(errorHandler);
 // START SERVER
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
