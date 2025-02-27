@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const Cohort = require("./models/cohort.model");
 const Student = require("./models/student.model");
+const {errorHandler, notFoundHandler} = require ("./middleware/error-handling");
 
 const PORT = 5005;
 
@@ -37,7 +38,9 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+app.use(notFoundHandler);
+app.use(errorHandler);
+ 
 // ROUTES - https://expressjs.com/en/starter/basic-routing.html
 // Devs Team - Start working on the routes here:
 // ...
@@ -186,3 +189,4 @@ app.delete("/api/cohorts/:cohortId", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
