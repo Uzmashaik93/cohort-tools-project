@@ -1,11 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
-const User = require("User");
+const User = require("../models/user.model");
 
 const isAuthenticated = require("../middleware/jwt.middleware")
-const TOKEN_SECRET = require("../../")
 const router = express.Router();
 const saltRounds = 10;
 
@@ -109,8 +109,8 @@ router.post('/auth/login', (req, res, next) => {
 
 // GET /auth/verify (Verify a JWT)
 //
-router.get('/verify', isAuthenticated, (req, res, next) => {
- 
+router.get('/verify',  (req, res, next) => {
+    res.send(isAuthenticated,)
     // If JWT token is valid the payload gets decoded by the
     // isAuthenticated middleware and made available on `req.payload`
     console.log(`req.payload`, req.payload);

@@ -43,7 +43,7 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use("/auth", authRouter);
+app.use("/", authRouter);
 app.use("/api/users", usersRoutes)   
 // ROUTES - https://expressjs.com/en/starter/basic-routing.html
 // Devs Team - Start working on the routes here:

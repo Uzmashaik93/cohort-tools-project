@@ -1,10 +1,12 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 const router = express.Router();
+const mongoose = require("mongoose");
 
-
-router.get("/:userId", isAuthenticated, (req, res, next) => {
+router.get("/:userId", (req, res, next) => {
+    res.send(isAuthenticated,)
     const { userId } = req.params;
   
     User.findById(userId)
