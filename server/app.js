@@ -3,10 +3,15 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
+
+const User = require("./models/user.model");
 const Cohort = require("./models/cohort.model");
 const Student = require("./models/student.model");
+
 const {errorHandler, notFoundHandler} = require ("./middleware/error-handling");
 
+const authRouter = require("./routes/auth.routes"); 
+const usersRoutes = require ("./routes/users.routes");
 const PORT = 5005;
 
 // STATIC DATA
@@ -38,8 +43,8 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
- 
+app.use("/auth", authRouter);
+app.use("/api/users", usersRoutes)   
 // ROUTES - https://expressjs.com/en/starter/basic-routing.html
 // Devs Team - Start working on the routes here:
 // ...
@@ -167,6 +172,7 @@ app.delete("/api/cohorts/:cohortId", (req, res, next) => {
     })
     .catch((e) => next(e));
 });
+
 
 app.use(notFoundHandler);
 app.use(errorHandler);
